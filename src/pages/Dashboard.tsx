@@ -1,170 +1,95 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../auth";
 import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  HStack,
-  VStack,
-  useDisclosure,
-  Text,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-  Spinner,
-  Center
-} from '@chakra-ui/react';
-import { AddIcon } from '@chakra-ui/icons';
-import { GoalForm } from '../components/GoalForm';
-import { GoalList } from '../components/GoalList';
-import type { Goal } from '../types';
-import { useAuth } from '../contexts/AuthContext';
-import { apiService } from '../services/api';
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { DataTable } from "../components/DatatableGoals";
 
-export const Dashboard: React.FC = () => {
-  const [myGoals, setMyGoals] = useState<Goal[]>([]);
-  const [allGoals, setAllGoals] = useState<Goal[]>([]);
+export default function DashboardPage() {
+  const { token } = useAuth();
+  const [goals, setGoals] = useState([] as Array<Record<string, unknown>>);
   const [loading, setLoading] = useState(true);
-  const disclosure = useDisclosure();
-  const { isOpen, onOpen, onClose } = disclosure;
-  const { user, logout } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadGoals();
-  }, [user]);
-
-  const loadGoals = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      const [userGoals, allGoalsData] = await Promise.all([
-        apiService.getGoalsByUser(user.id),
-        apiService.getGoals()
-      ]);
-      
-      setMyGoals(userGoals);
-      setAllGoals(allGoalsData.filter(goal => goal.ownerId !== user.id));
-    } catch (error) {
-      console.error('Error loading goals:', error);
-    } finally {
-      setLoading(false);
+    let mounted = true;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/goals", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "No se pudieron cargar los objetivos");
+        }
+        const data = await res.json();
+        if (mounted) setGoals(data);
+      } catch (e) {
+        if (mounted) setError((e as Error).message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     }
-  };
+    if (token) load();
+    return () => {
+      mounted = false;
+    };
+  }, [token]);
 
-  const handleGoalCreated = (newGoal: Goal) => {
-    setMyGoals(prev => [newGoal, ...prev]);
-  };
+  const stats = useMemo(() => {
+    const total = goals.length;
+    const completed = goals.filter((g) => g.status === "completed").length;
+    const inProgress = goals.filter((g) => g.status === "in_progress").length;
+    const pending = goals.filter((g) => g.status === "pending").length;
+    return { total, completed, inProgress, pending };
+  }, [goals]);
 
-  const handleMyGoalUpdate = (updatedGoal: Goal) => {
-    setMyGoals(prev => prev.map(goal => 
-      goal.id === updatedGoal.id ? updatedGoal : goal
-    ));
-  };
-
-  const handleMyGoalDelete = (goalId: string) => {
-    setMyGoals(prev => prev.filter(goal => goal.id !== goalId));
-  };
-
-  const handleAllGoalUpdate = (updatedGoal: Goal) => {
-    setAllGoals(prev => prev.map(goal => 
-      goal.id === updatedGoal.id ? updatedGoal : goal
-    ));
-  };
-
-  const handleAllGoalDelete = (goalId: string) => {
-    setAllGoals(prev => prev.filter(goal => goal.id !== goalId));
-  };
-
-  if (loading) {
-    return (
-      <Center h="100vh">
-        <Spinner size="xl" />
-      </Center>
-    );
-  }
+  // DataTable ahora se alimenta del backend si no recibe props
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <VStack spacing={6} align="stretch">
-        {/* Header */}
-        <HStack justify="space-between" align="center">
-          <VStack align="start" spacing={1}>
-            <Heading size="lg">Creador de Objetivos</Heading>
-            <Text color="gray.600">Bienvenido, {user?.username}</Text>
-          </VStack>
-          <HStack>
-            <Button leftIcon={<AddIcon />} colorScheme="blue" onClick={onOpen}>
-              Nuevo Objetivo
-            </Button>
-            <Button variant="outline" onClick={logout}>
-              Cerrar Sesión
-            </Button>
-          </HStack>
-        </HStack>
+    <div className="mx-auto max-w-6xl p-6 space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Total objetivos</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-bold">
+            {stats.total}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Completados</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-bold">
+            {stats.completed}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>En progreso</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-bold">
+            {stats.inProgress}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Pendientes</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-bold">
+            {stats.pending}
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Tabs for different views */}
-        <Tabs>
-          <TabList>
-            <Tab>Mis Objetivos ({myGoals.length})</Tab>
-            <Tab>Todos los Objetivos ({allGoals.length})</Tab>
-          </TabList>
-
-          <TabPanels>
-            <TabPanel>
-              <VStack align="stretch" spacing={4}>
-                <Heading size="md">Mis Objetivos</Heading>
-                {myGoals.length === 0 ? (
-                  <Box textAlign="center" py={8}>
-                    <Text color="gray.500" mb={4}>
-                      No tienes objetivos creados aún
-                    </Text>
-                    <Button leftIcon={<AddIcon />} colorScheme="blue" onClick={onOpen}>
-                      Crear tu primer objetivo
-                    </Button>
-                  </Box>
-                ) : (
-                  <GoalList
-                    goals={myGoals}
-                    onGoalUpdate={handleMyGoalUpdate}
-                    onGoalDelete={handleMyGoalDelete}
-                    showOwner={false}
-                  />
-                )}
-              </VStack>
-            </TabPanel>
-
-            <TabPanel>
-              <VStack align="stretch" spacing={4}>
-                <Heading size="md">Objetivos de Otros Usuarios</Heading>
-                {allGoals.length === 0 ? (
-                  <Box textAlign="center" py={8}>
-                    <Text color="gray.500">
-                      No hay objetivos de otros usuarios para mostrar
-                    </Text>
-                  </Box>
-                ) : (
-                  <GoalList
-                    goals={allGoals}
-                    onGoalUpdate={handleAllGoalUpdate}
-                    onGoalDelete={handleAllGoalDelete}
-                    showOwner={true}
-                  />
-                )}
-              </VStack>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </VStack>
-
-      {/* Goal Creation Modal */}
-      <GoalForm
-        isOpen={isOpen}
-        onClose={onClose}
-        onGoalCreated={handleGoalCreated}
-      />
-    </Container>
+      {error && <div className="text-red-500">{error}</div>}
+      {loading ? <div>Cargando objetivos...</div> : <DataTable />}
+    </div>
   );
-};
+}

@@ -1,32 +1,37 @@
-import React from 'react';
-import { Box } from '@chakra-ui/react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LoginForm } from './components/LoginForm';
-import { Dashboard } from './pages/Dashboard';
-
-const AppContent: React.FC = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-        Loading...
-      </Box>
-    );
-  }
-
-  return (
-    <Box minH="100vh" bg="gray.50">
-      {user ? <Dashboard /> : <LoginForm />}
-    </Box>
-  );
-};
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import { LoginForm } from "./pages/Login";
+import { RegisterForm } from "./pages/Register";
+import AccountPage from "./pages/Account";
+import DashboardPage from "./pages/Dashboard";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </>
   );
 }
 
