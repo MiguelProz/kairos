@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+.dist
+.git
+.gitignore
+Dockerfile*
+.nginx*
+.vscode
+npm-debug.log*
+yarn-error.log*
+dist
+backend/node_modules
+backend/dist
