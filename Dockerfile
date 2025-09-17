@@ -3,7 +3,6 @@
 ## - Stage runtime: ejecuta Express sirviendo API y frontend en el puerto 3000
 
 FROM node:20-alpine AS build
-WORKDIR /app
 
 # Copia manifests y usa caché
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
@@ -16,7 +15,6 @@ COPY . .
 RUN npm run build
 
 FROM node:20-alpine AS runtime
-WORKDIR /app
 ENV NODE_ENV=production
 
 # Copiar node_modules de raíz y de backend
