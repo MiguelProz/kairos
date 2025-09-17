@@ -9,7 +9,7 @@ WORKDIR /app
 RUN ls -la
 
 # Copia manifests y usa caché
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* /app/backend/package* ./
 RUN npm ci || npm install
 
 # Copiar el resto del repo
