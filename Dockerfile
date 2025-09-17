@@ -6,7 +6,6 @@ FROM node:20-slim AS build
 
 WORKDIR /app
 
-RUN ls -la
 
 # Copia manifests y usa caché
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* backend/package* ./
@@ -17,6 +16,7 @@ COPY . .
 
 # Construir backend y frontend (usa los scripts del monorepo)
 RUN npm run build
+RUN ls -la
 
 FROM node:20-alpine AS runtime
 WORKDIR /app
@@ -25,10 +25,12 @@ ENV NODE_ENV=production
 # Copiar node_modules de raíz y de backend
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/backend/node_modules ./backend/node_modules
+RUN ls -la
 
 # Copiar dist del front y del back
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/backend/dist ./backend/dist
+RUN ls -la
 
 # Copiar package.json para posibles introspecciones
 COPY package.json ./package.json
