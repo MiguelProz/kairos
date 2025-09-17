@@ -3,7 +3,6 @@
 ## - Stage runtime: ejecuta Express sirviendo API y frontend en el puerto 3000
 
 FROM node:20-slim AS build
-RUN pwd
 
 WORKDIR /app
 
@@ -18,6 +17,7 @@ COPY . .
 RUN npm run build
 
 FROM node:20-alpine AS runtime
+WORKDIR /app
 ENV NODE_ENV=production
 
 # Copiar node_modules de raíz y de backend
