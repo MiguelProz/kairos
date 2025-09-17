@@ -2,7 +2,10 @@
 ## - Stage build: instala deps, compila backend y build de Vite
 ## - Stage runtime: ejecuta Express sirviendo API y frontend en el puerto 3000
 
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
+RUN pwd
+
+WORKDIR /app
 
 # Copia manifests y usa caché
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
