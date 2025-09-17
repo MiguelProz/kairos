@@ -7,7 +7,6 @@ FROM node:20-slim AS build
 WORKDIR /app
 
 # Copia manifests y usa caché
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 RUN npm ci || npm install
 
 # Copiar el resto del repo
