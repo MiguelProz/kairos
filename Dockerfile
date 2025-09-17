@@ -19,6 +19,7 @@ COPY . .
 RUN npm run build
 
 FROM node:20-alpine AS runtime
+WORKDIR /app
 ENV NODE_ENV=production
 
 # Copiar node_modules de raíz y de backend
