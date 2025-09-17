@@ -80,6 +80,44 @@ npm run preview
 npm run lint
 ```
 
+### Despliegue en contenedor/Pod
+
+Este repositorio ahora usa npm workspaces para gestionar el `backend/` como un paquete hijo. Para que las dependencias del backend se instalen durante el build:
+
+- Asegúrate de usar Node.js 18+ y npm 9+ (workspaces nativos).
+- Ejecuta `npm install` en la raíz del repo. Se ejecutará automáticamente un `postinstall` que hace `npm install --prefix backend` como respaldo si el gestor de paquetes no maneja workspaces.
+- Para construir todo:
+
+```bash
+npm run build
+```
+
+En Docker/K8s, una receta mínima de Dockerfile multi-stage podría ser:
+
+```Dockerfile
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY backend/package.json backend/
+RUN npm ci --ignore-scripts=false
+
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+# (Opcional) Servir frontend estático con nginx y correr backend en otro pod/servicio
+```
+
+Si el backend y frontend van en el mismo contenedor de desarrollo, puedes usar:
+
+```bash
+npm run dev
+```
+
+Nota: Si tu Pod ejecuta solo el backend, instala y construye dentro de `backend/` con `npm ci && npm run build && npm start`.
+
 ## Demo de Uso
 
 ### 1. Registro/Login

@@ -3,9 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "backend"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"vite\"",
     "build": "npm run build --prefix backend && vite build",
+    "postinstall": "npm install --prefix backend",
     "lint": "eslint .",
     "preview": "vite preview"
   },
