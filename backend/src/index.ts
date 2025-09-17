@@ -14,7 +14,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/goals', goalsRoutes);
 
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 const MONGO_URI = process.env.MONGO_URI || '';
 
 mongoose.connect(MONGO_URI)

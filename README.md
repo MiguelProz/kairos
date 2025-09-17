@@ -5,11 +5,13 @@ Una aplicación web moderna para crear y gestionar objetivos personales, constru
 ## Características
 
 ### 🔐 Autenticación Básica
+
 - Sistema de registro e inicio de sesión
 - Gestión de usuarios con localStorage (simula base de datos MongoDB)
 - Sesiones persistentes
 
 ### 🎯 Gestión de Objetivos
+
 - **Crear objetivos** con información completa:
   - Título y descripción
   - Fecha límite
@@ -21,6 +23,7 @@ Una aplicación web moderna para crear y gestionar objetivos personales, constru
 - **Eliminar objetivos** - Solo los propios objetivos
 
 ### 🎨 Interfaz de Usuario
+
 - **Chakra UI v2** - Componentes modernos y accesibles
 - **Diseño responsivo** - Funciona en desktop y móvil
 - **Notificaciones** - Feedback visual para todas las acciones
@@ -28,6 +31,7 @@ Una aplicación web moderna para crear y gestionar objetivos personales, constru
 - **Modal forms** - Formularios elegantes para crear objetivos
 
 ### 🏗️ Arquitectura Técnica
+
 - **Vite** - Build tool y dev server ultra-rápido
 - **React 19** con TypeScript
 - **Estructura modular**:
@@ -58,6 +62,7 @@ src/
 ## Instalación y Uso
 
 ### Requisitos
+
 - Node.js 18+
 - npm o yarn
 
@@ -121,15 +126,18 @@ Nota: Si tu Pod ejecuta solo el backend, instala y construye dentro de `backend/
 ## Demo de Uso
 
 ### 1. Registro/Login
+
 - Registra un nuevo usuario o usa cualquier usuario existente con contraseña "password"
 - La autenticación es básica pero funcional
 
 ### 2. Crear Objetivos
+
 - Haz clic en "Nuevo Objetivo"
 - Completa el formulario con título, descripción, fecha y prioridad
 - El objetivo se guarda automáticamente
 
 ### 3. Gestionar Objetivos
+
 - **Mis Objetivos**: Ve y edita tus objetivos personales
 - **Todos los Objetivos**: Explora objetivos de otros usuarios
 - Marca objetivos como completados con checkboxes
@@ -148,16 +156,16 @@ Nota: Si tu Pod ejecuta solo el backend, instala y construye dentro de `backend/
 
 ## Características Implementadas Según Requisitos
 
-✅ **Autenticación básica** - Sistema completo de login/registro  
-✅ **Base de datos simulada** - localStorage simula MongoDB en la nube  
-✅ **Chakra UI** - Interfaz completa con componentes existentes  
-✅ **Vite framework** - Configuración y build con Vite  
-✅ **Creador de objetivos** - Formulario completo con todos los campos  
-✅ **Marcar propietario** - Automático al crear objetivos  
-✅ **Fecha y descripción** - Campos obligatorios en el formulario  
-✅ **Marcado por usuario** - Separación clara de objetivos por usuario  
-✅ **Ver objetivos de otros** - Tab dedicado para explorar objetivos públicos  
-✅ **Solo componentes Chakra UI** - No se crearon componentes personalizados  
+✅ **Autenticación básica** - Sistema completo de login/registro
+✅ **Base de datos simulada** - localStorage simula MongoDB en la nube
+✅ **Chakra UI** - Interfaz completa con componentes existentes
+✅ **Vite framework** - Configuración y build con Vite
+✅ **Creador de objetivos** - Formulario completo con todos los campos
+✅ **Marcar propietario** - Automático al crear objetivos
+✅ **Fecha y descripción** - Campos obligatorios en el formulario
+✅ **Marcado por usuario** - Separación clara de objetivos por usuario
+✅ **Ver objetivos de otros** - Tab dedicado para explorar objetivos públicos
+✅ **Solo componentes Chakra UI** - No se crearon componentes personalizados
 
 ## Próximas Mejoras
 
