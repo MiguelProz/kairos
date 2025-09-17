@@ -11,7 +11,7 @@
     "build": "npm run build --prefix backend && vite build",
     "postinstall": "npm install --prefix backend",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --port 3000"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
