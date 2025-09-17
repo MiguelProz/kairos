@@ -4,11 +4,12 @@
 
 FROM node:20-slim AS build
 
-RUN ls -la
-
 WORKDIR /app
 
+RUN ls -la
+
 # Copia manifests y usa caché
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 RUN npm ci || npm install
 
 # Copiar el resto del repo
@@ -18,7 +19,6 @@ COPY . .
 RUN npm run build
 
 FROM node:20-alpine AS runtime
-WORKDIR /app
 ENV NODE_ENV=production
 
 # Copiar node_modules de raíz y de backend
