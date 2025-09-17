@@ -6,13 +6,9 @@ FROM node:20-slim AS build
 
 WORKDIR /app
 
-
 # Copia manifests y usa caché
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* backend/package* ./
-RUN npm ci || npm install
-
-# Copiar el resto del repo
 COPY . .
+RUN npm ci || npm install
 
 # Construir backend y frontend (usa los scripts del monorepo)
 RUN npm run build
