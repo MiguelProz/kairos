@@ -4,6 +4,8 @@
 
 FROM node:20-slim AS build
 
+RUN ls -la
+
 WORKDIR /app
 
 # Copia manifests y usa caché
