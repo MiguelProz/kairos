@@ -112,12 +112,15 @@ export function LoginForm({
                     </Button>
                   </div>
                   <div className="text-center text-sm">
-                    Don&apos;t have an account?{" "}
+                    ¿No tienes una cuenta?{" "}
                     <a
-                      href="/register"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/register");
+                      }}
                       className="underline underline-offset-4"
                     >
-                      Sign up
+                      Registrarse
                     </a>
                   </div>
                 </div>

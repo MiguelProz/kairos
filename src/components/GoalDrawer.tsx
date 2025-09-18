@@ -163,7 +163,7 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="ng-due">Fecha de vencimiento</Label>
-              <div className="hidden w-full sm:block">
+              <div className="hidden sm:block">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -195,10 +195,11 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="w-full sm:hidden">
+              <div className="sm:hidden">
                 <Input
                   id="ng-due"
                   type="date"
+                  className="w-full"
                   value={form.dueDate}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, dueDate: e.target.value }))
