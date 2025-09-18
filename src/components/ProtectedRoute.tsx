@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { token, user, loading } = useAuth();
+  const { token, loading } = useAuth();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
@@ -23,15 +23,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
-  console.log(
-    "ProtectedRoute - token:",
-    token,
-    "user:",
-    user,
-    "loading:",
-    loading
-  );
+  // Si no hay token, redirigimos al login
   if (!token) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }

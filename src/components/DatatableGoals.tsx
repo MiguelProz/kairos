@@ -26,7 +26,6 @@ import {
   IconChevronsRight,
   IconGripVertical,
   IconLayoutColumns,
-  IconPlus,
 } from "@tabler/icons-react";
 import {
   ColumnDef,
@@ -92,20 +91,13 @@ import {
 } from "@/components/ui/tabs";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
-
-// Tipo Goal (alineado con el backend)
-type Goal = {
-  _id: string;
-  title: string;
-  description?: string;
-  category?: string;
-  status: "pending" | "in_progress" | "completed" | "archived";
-  priority: "low" | "medium" | "high";
-  progress?: number;
-  dueDate?: string;
-  createdAt: string;
-  updatedAt?: string;
-};
+import AddGoalDrawer from "./GoalDrawer";
+import { Goal } from "@/types/goal";
+import { Slider } from "./ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Calendar } from "./ui/calendar";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 // Create a separate component for the drag handle
 function DragHandle({ id }: { id: number }) {
@@ -331,14 +323,19 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
         cell: ({ row }) => {
           const bgs: Record<Goal["status"], string> = {
             pending: "bg-blue-500 text-white",
-            in_progress: "bg-yellow-500 text-white",
-            completed: "bg-green-500 text-white",
+            in_progress: "bg-yellow-500 text-black",
+            completed: "bg-green-500 text-black",
             archived: "bg-gray-400 text-black",
+          };
+          const traducion_esp = {
+            pending: "Pendiente",
+            in_progress: "En progreso",
+            completed: "Completado",
+            archived: "Archivado",
           };
           return (
             <Badge className={bgs[row.original.status]}>
-              {row.original.status.charAt(0).toUpperCase() +
-                row.original.status.slice(1).replace("_", " ")}
+              {traducion_esp[row.original.status]}
             </Badge>
           );
         },
@@ -346,7 +343,23 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
       {
         accessorKey: "priority",
         header: () => <div>Prioridad</div>,
-        cell: ({ row }) => <span>{row.original.priority}</span>,
+        cell: ({ row }) => {
+          const bgs: Record<Goal["priority"], string> = {
+            low: "bg-green-500/40 text-white",
+            medium: "bg-yellow-500/40 text-white",
+            high: "bg-red-500/40 text-white",
+          };
+          const traduccion_esp = {
+            low: "Baja",
+            medium: "Media",
+            high: "Alta",
+          };
+          return (
+            <Badge className={bgs[row.original.priority]} variant={"outline"}>
+              {traduccion_esp[row.original.priority]}
+            </Badge>
+          );
+        },
       },
       {
         accessorKey: "progress",
@@ -686,7 +699,7 @@ function TableCellViewer({
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>{item.title}</DrawerTitle>
+          <DrawerTitle>Modificar {item.title}</DrawerTitle>
           <DrawerDescription>Detalles del objetivo</DrawerDescription>
         </DrawerHeader>
         <form
@@ -694,7 +707,7 @@ function TableCellViewer({
           onSubmit={handleSubmit}
         >
           <div className="flex flex-col gap-3">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Título</Label>
             <Input
               id="title"
               type="text"
@@ -706,7 +719,7 @@ function TableCellViewer({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">Categoría</Label>
               <Input
                 id="category"
                 type="text"
@@ -717,7 +730,7 @@ function TableCellViewer({
               />
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">Estado</Label>
               <Select
                 value={status}
                 onValueChange={(v) => setStatus(v as Goal["status"])}
@@ -726,36 +739,52 @@ function TableCellViewer({
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in_progress">In progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
+                  <SelectItem value="pending">Pendiente</SelectItem>
+                  <SelectItem value="in_progress">En progreso</SelectItem>
+                  <SelectItem value="completed">Completado</SelectItem>
+                  <SelectItem value="archived">Archivado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="progress">Progress (%)</Label>
-              <Input
-                id="progress"
-                type="number"
+              <Label htmlFor="progress">Progreso ({progress}%)</Label>
+              <Slider
+                value={[Number(progress)]}
+                onValueChange={(v) =>
+                  setProgress(String(Array.isArray(v) ? v[0] : v))
+                }
                 min={0}
                 max={100}
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={progress}
-                onChange={(e) => setProgress(e.target.value)}
+                step={1}
+                id="progress"
+                className="my-auto"
               />
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="dueDate">Due date</Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={due}
-                onChange={(e) => setDue(e.target.value)}
-              />
+              <Label htmlFor="dueDate">Fecha de vencimiento</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    data-empty={!due}
+                    className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon />
+                    {due ? due : <span>Selecciona fecha</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={due ? new Date(due) : undefined}
+                    onSelect={(date) =>
+                      setDue(date ? format(date, "dd/MM/yyyy") : "")
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <div className="flex flex-col gap-3">
@@ -787,181 +816,6 @@ function TableCellViewer({
               </Button>
             </div>
           </DrawerFooter>
-        </form>
-      </DrawerContent>
-    </Drawer>
-  );
-}
-
-// Drawer para crear un nuevo objetivo
-function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
-  const { token } = useAuth();
-  const [open, setOpen] = React.useState(false);
-  const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [form, setForm] = React.useState({
-    title: "",
-    category: "",
-    priority: "medium" as Goal["priority"],
-    dueDate: "",
-    description: "",
-    visibility: "private" as "private" | "public",
-  });
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!token) return;
-    setSubmitting(true);
-    setError(null);
-    try {
-      const body: Record<string, unknown> = {
-        title: form.title.trim(),
-        category: form.category.trim() || undefined,
-        priority: form.priority,
-        description: form.description.trim() || undefined,
-        visibility: form.visibility,
-      };
-      if (form.dueDate) body.dueDate = new Date(form.dueDate).toISOString();
-      const res = await fetch("/api/goals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "No se pudo crear el objetivo");
-      }
-      const goal = (await res.json()) as Goal;
-      onCreated(goal);
-      setOpen(false);
-      setForm({
-        title: "",
-        category: "",
-        priority: "medium",
-        dueDate: "",
-        description: "",
-        visibility: "private",
-      });
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="outline" size="sm">
-          <IconPlus />
-          <span className="hidden lg:inline">Add Goal</span>
-          <span className="lg:hidden">Add</span>
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="gap-1">
-          <DrawerTitle>New goal</DrawerTitle>
-          <DrawerDescription>Create a new goal</DrawerDescription>
-        </DrawerHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-4 pb-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="ng-title">Title</Label>
-            <Input
-              id="ng-title"
-              value={form.title}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, title: e.target.value }))
-              }
-              required
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ng-category">Category</Label>
-              <Input
-                id="ng-category"
-                value={form.category}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, category: e.target.value }))
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ng-priority">Priority</Label>
-              <Select
-                value={form.priority}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, priority: v as Goal["priority"] }))
-                }
-              >
-                <SelectTrigger id="ng-priority">
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ng-due">Due date</Label>
-              <Input
-                id="ng-due"
-                type="date"
-                value={form.dueDate}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, dueDate: e.target.value }))
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ng-visibility">Visibility</Label>
-              <Select
-                value={form.visibility}
-                onValueChange={(v) =>
-                  setForm((f) => ({
-                    ...f,
-                    visibility: v as "private" | "public",
-                  }))
-                }
-              >
-                <SelectTrigger id="ng-visibility">
-                  <SelectValue placeholder="Select visibility" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="private">Private</SelectItem>
-                  <SelectItem value="public">Public</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="ng-desc">Description</Label>
-            <Input
-              id="ng-desc"
-              value={form.description}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, description: e.target.value }))
-              }
-            />
-          </div>
-          {error && <div className="text-destructive text-sm">{error}</div>}
-          <div className="flex gap-2 justify-end">
-            <DrawerClose asChild>
-              <Button type="button" variant="outline">
-                Cancel
-              </Button>
-            </DrawerClose>
-            <Button type="submit" disabled={submitting || !form.title.trim()}>
-              {submitting ? "Creating..." : "Create"}
-            </Button>
-          </div>
         </form>
       </DrawerContent>
     </Drawer>

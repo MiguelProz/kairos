@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa';
-import manifestJson from './public/manifest.json' assert { type: 'json' };
+import manifestJson from './public/manifest.json' with { type: 'json' };
 import pkg from './package.json';
 
 // https://vite.dev/config/
