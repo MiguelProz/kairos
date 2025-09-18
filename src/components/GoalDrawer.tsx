@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/providers/auth-provider";
 import { Goal } from "@/types/goal";
 import * as React from "react";
@@ -27,9 +28,34 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 
-function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
+import { DatatableRow } from "./DatatableGoals.schema";
+type AddGoalDrawerProps = {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  goal?: Partial<Goal> | Partial<DatatableRow> | null;
+  onCreated: (goal: Goal) => void;
+  onUpdated?: (goal: Goal) => void;
+};
+
+function isDatatableRow(obj: any): obj is DatatableRow {
+  return obj && typeof obj === "object" && "goalId" in obj;
+}
+function isGoal(obj: any): obj is Goal {
+  return obj && typeof obj === "object" && "_id" in obj;
+}
+
+function AddGoalDrawer({
+  open,
+  onOpenChange,
+  goal,
+  onCreated,
+  onUpdated,
+}: AddGoalDrawerProps) {
   const { token } = useAuth();
-  const [open, setOpen] = React.useState(false);
+  // Permitir goal._id o goal.goalId como identificador
+  const isEdit =
+    !!goal &&
+    (isGoal(goal) ? !!goal._id : isDatatableRow(goal) ? !!goal.goalId : false);
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [form, setForm] = React.useState({
@@ -40,6 +66,33 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
     description: "",
     visibility: "private" as "private" | "public",
   });
+
+  // Sincroniza el formulario cuando cambia goal
+  React.useEffect(() => {
+    if (
+      goal &&
+      (isGoal(goal) ? goal._id : isDatatableRow(goal) ? goal.goalId : false)
+    ) {
+      setForm({
+        title: goal.title || "",
+        category: goal.category || "",
+        priority: goal.priority || "medium",
+        dueDate: goal.dueDate ? goal.dueDate.slice(0, 10) : "",
+        description: isGoal(goal) ? goal.description || "" : "",
+        visibility: "private",
+      });
+    } else {
+      setForm({
+        title: "",
+        category: "",
+        priority: "medium",
+        dueDate: "",
+        description: "",
+        visibility: "private",
+      });
+    }
+    setError(null);
+  }, [goal]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,29 +108,47 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
         visibility: form.visibility,
       };
       if (form.dueDate) body.dueDate = new Date(form.dueDate).toISOString();
-      const res = await fetch("/api/goals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      let res: Response;
+      let goalId = "";
+      if (goal) {
+        if (isGoal(goal)) goalId = goal._id || "";
+        else if (isDatatableRow(goal)) goalId = goal.goalId || "";
+      }
+      if (isEdit && goalId) {
+        res = await fetch(`/api/goals/${goalId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      } else {
+        res = await fetch("/api/goals", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "No se pudo crear el objetivo");
+        throw new Error(
+          data.error ||
+            (isEdit
+              ? "No se pudo actualizar el objetivo"
+              : "No se pudo crear el objetivo")
+        );
       }
-      const goal = (await res.json()) as Goal;
-      onCreated(goal);
-      setOpen(false);
-      setForm({
-        title: "",
-        category: "",
-        priority: "medium",
-        dueDate: "",
-        description: "",
-        visibility: "private",
-      });
+      const updatedGoal = (await res.json()) as Goal;
+      if (isEdit && onUpdated) {
+        onUpdated(updatedGoal);
+      } else {
+        onCreated(updatedGoal);
+      }
+      if (onOpenChange) onOpenChange(false);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -86,17 +157,25 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen} dismissible={false}>
-      <DrawerTrigger asChild>
-        <Button variant="outline" size="sm">
-          <IconPlus />
-          <span className="inline">Añadir Objetivo</span>
-        </Button>
-      </DrawerTrigger>
+    <Drawer open={!!open} onOpenChange={onOpenChange} dismissible={false}>
+      {!isEdit && (
+        <DrawerTrigger asChild>
+          <Button variant="outline" size="sm">
+            <IconPlus />
+            <span className="inline">Añadir Objetivo</span>
+          </Button>
+        </DrawerTrigger>
+      )}
       <DrawerContent>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>Añadir Objetivo</DrawerTitle>
-          <DrawerDescription>Crear un nuevo objetivo</DrawerDescription>
+          <DrawerTitle>
+            {isEdit ? "Editar Objetivo" : "Añadir Objetivo"}
+          </DrawerTitle>
+          <DrawerDescription>
+            {isEdit
+              ? "Editar los datos del objetivo"
+              : "Crear un nuevo objetivo"}
+          </DrawerDescription>
         </DrawerHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-4 pb-4">
           <div className="flex flex-col gap-3">
@@ -224,13 +303,19 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={onOpenChange ? () => onOpenChange(false) : undefined}
               >
                 Cancelar
               </Button>
             </DrawerClose>
             <Button type="submit" disabled={submitting || !form.title.trim()}>
-              {submitting ? "Creando..." : "Crear"}
+              {submitting
+                ? isEdit
+                  ? "Guardando..."
+                  : "Creando..."
+                : isEdit
+                ? "Guardar cambios"
+                : "Crear"}
             </Button>
           </div>
         </form>
