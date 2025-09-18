@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { DataTable } from "../components/DatatableGoals";
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
   const { token } = useAuth();
@@ -46,7 +47,8 @@ export default function DashboardPage() {
     const completed = goals.filter((g) => g.status === "completed").length;
     const inProgress = goals.filter((g) => g.status === "in_progress").length;
     const pending = goals.filter((g) => g.status === "pending").length;
-    return { total, completed, inProgress, pending };
+    const archived = goals.filter((g) => g.status === "archived").length;
+    return { total, completed, inProgress, pending, archived };
   }, [goals]);
 
   // DataTable ahora se alimenta del backend si no recibe props
@@ -56,34 +58,28 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
-            <CardTitle>Total objetivos</CardTitle>
+            <CardTitle>
+              <div className="flex justify-between items-center">
+                <div className=" text-muted-foreground">Objetivos Totales</div>
+                <span className="font-bold ">{stats.total}</span>
+              </div>
+            </CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold">
-            {stats.total}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Completados</CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-bold">
-            {stats.completed}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>En progreso</CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-bold">
-            {stats.inProgress}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Pendientes</CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-bold">
-            {stats.pending}
+          <CardContent>
+            <div className="flex flex-wrap gap-2 content-center justify-center">
+              <Badge variant="secondary" className="bg-green-500 text-black">
+                {stats.completed} Completados
+              </Badge>
+              <Badge variant="secondary" className="bg-yellow-500 text-black">
+                {stats.inProgress} En progreso
+              </Badge>
+              <Badge variant="secondary" className="bg-blue-500 text-white">
+                {stats.pending} Pendientes
+              </Badge>
+              <Badge variant="secondary" className="bg-gray-500 text-white">
+                {stats.archived} Archivados
+              </Badge>
+            </div>
           </CardContent>
         </Card>
       </div>

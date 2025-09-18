@@ -325,7 +325,7 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
             pending: "bg-blue-500 text-white",
             in_progress: "bg-yellow-500 text-black",
             completed: "bg-green-500 text-black",
-            archived: "bg-gray-400 text-black",
+            archived: "bg-gray-500 text-white",
           };
           const traducion_esp = {
             pending: "Pendiente",
