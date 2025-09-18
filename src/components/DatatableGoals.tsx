@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import {
   closestCenter,
@@ -92,6 +90,8 @@ import {
   // TabsList,
   // TabsTrigger,
 } from "@/components/ui/tabs";
+import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
 
 // Tipo Goal (alineado con el backend)
 type Goal = {
@@ -328,7 +328,20 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
       {
         accessorKey: "status",
         header: () => <div>Estado</div>,
-        cell: ({ row }) => <span>{row.original.status}</span>,
+        cell: ({ row }) => {
+          const bgs: Record<Goal["status"], string> = {
+            pending: "bg-blue-500 text-white",
+            in_progress: "bg-yellow-500 text-white",
+            completed: "bg-green-500 text-white",
+            archived: "bg-gray-400 text-black",
+          };
+          return (
+            <Badge className={bgs[row.original.status]}>
+              {row.original.status.charAt(0).toUpperCase() +
+                row.original.status.slice(1).replace("_", " ")}
+            </Badge>
+          );
+        },
       },
       {
         accessorKey: "priority",
@@ -337,8 +350,15 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
       },
       {
         accessorKey: "progress",
-        header: () => <div>Progreso (%)</div>,
-        cell: ({ row }) => <span>{row.original.progress}</span>,
+        header: () => <div>Progreso</div>,
+        cell: ({ row }) => (
+          <Progress
+            value={row.original.progress}
+            max={100}
+            className="w-[60%]"
+            aria-label="Progreso"
+          />
+        ),
       },
       {
         accessorKey: "dueDate",
