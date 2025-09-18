@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "../auth";
+import { useAuth } from "../providers/auth-provider";
 import {
   Card,
   CardContent,
@@ -52,7 +52,7 @@ export default function DashboardPage() {
   // DataTable ahora se alimenta del backend si no recibe props
 
   return (
-    <div className="mx-auto max-w-6xl p-6 space-y-6">
+    <div className="gap-6 flex flex-col w-full">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>

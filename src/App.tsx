@@ -1,37 +1,38 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { LoginForm } from "./pages/Login";
 import { RegisterForm } from "./pages/Register";
 import AccountPage from "./pages/Account";
 import DashboardPage from "./pages/Dashboard";
-import Navbar from "./components/Navbar";
+import StackedLayout from "./components/StackedLayout";
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
-        <Route
-          path="/dashboard"
-          element={
+    <Routes>
+      <Route path="/login" element={<LoginForm />} />
+      <Route path="/register" element={<RegisterForm />} />
+      <Route
+        path="/dashboard"
+        element={
+          <StackedLayout>
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/account"
-          element={
+          </StackedLayout>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <StackedLayout>
             <ProtectedRoute>
               <AccountPage />
             </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
-    </>
+          </StackedLayout>
+        }
+      />
+      <Route path="*" element={<Navigate to="/dashboard" />} />
+    </Routes>
   );
 }
 

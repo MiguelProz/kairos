@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../auth";
+import { useAuth } from "../providers/auth-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardHeader,
   CardTitle,
@@ -94,103 +93,95 @@ export default function AccountPage({
   }
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Mi cuenta</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={onSubmit}>
-                <div className="flex flex-col gap-6">
-                  <div className="grid gap-3">
-                    <Label htmlFor="name">Nombre</Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="nickname">Nickname</Label>
-                    <Input
-                      id="nickname"
-                      value={nickname}
-                      onChange={(e) => setNickname(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="bio">Bio</Label>
-                    <Input
-                      id="bio"
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="avatarUrl">Avatar URL</Label>
-                    <Input
-                      id="avatarUrl"
-                      value={avatarUrl}
-                      onChange={(e) => setAvatarUrl(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="currentPassword">Contraseña actual</Label>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="newPassword">Nueva contraseña</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      disabled={saving}
-                    />
-                  </div>
-                  {error && (
-                    <div className="text-red-500 text-sm text-center">
-                      {error}
-                    </div>
-                  )}
-                  {message && (
-                    <div className="text-green-600 text-sm text-center">
-                      {message}
-                    </div>
-                  )}
-                  <div className="flex flex-col gap-3">
-                    <Button type="submit" className="w-full" disabled={saving}>
-                      {saving ? "Guardando..." : "Guardar cambios"}
-                    </Button>
-                  </div>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+    <div className={cn("max-w-3xl w-full mx-auto", className)} {...props}>
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl">Mi cuenta</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={onSubmit}>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-3">
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="nickname">Nickname</Label>
+              <Input
+                id="nickname"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="bio">Bio</Label>
+              <Input
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="avatarUrl">Avatar URL</Label>
+              <Input
+                id="avatarUrl"
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="currentPassword">Contraseña actual</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="newPassword">Nueva contraseña</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            {error && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
+            {message && (
+              <div className="text-green-600 text-sm text-center">
+                {message}
+              </div>
+            )}
+            <div className="flex flex-col gap-3">
+              <Button type="submit" className="w-full" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </CardContent>
     </div>
   );
 }

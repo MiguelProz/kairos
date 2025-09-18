@@ -47,7 +47,7 @@ import {
 } from "@tanstack/react-table";
 // import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { type DatatableRow } from "./DatatableGoals.schema";
-import { useAuth } from "@/auth";
+import { useAuth } from "@/providers/auth-provider";
 
 import { Button } from "@/components/ui/button";
 // import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"

@@ -10,7 +10,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { ListTodo } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../auth";
+import { useAuth } from "../providers/auth-provider";
 import { useNavigate } from "react-router-dom";
 
 export function LoginForm({
@@ -113,7 +113,10 @@ export function LoginForm({
                   </div>
                   <div className="text-center text-sm">
                     Don&apos;t have an account?{" "}
-                    <a href="/register" className="underline underline-offset-4">
+                    <a
+                      href="/register"
+                      className="underline underline-offset-4"
+                    >
                       Sign up
                     </a>
                   </div>
