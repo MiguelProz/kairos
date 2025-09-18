@@ -677,6 +677,9 @@ function TableCellViewer({
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
+              type="text"
+              autoComplete="off"
+              inputMode="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -686,6 +689,9 @@ function TableCellViewer({
               <Label htmlFor="category">Category</Label>
               <Input
                 id="category"
+                type="text"
+                autoComplete="off"
+                inputMode="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               />
@@ -716,6 +722,8 @@ function TableCellViewer({
                 type="number"
                 min={0}
                 max={100}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={progress}
                 onChange={(e) => setProgress(e.target.value)}
               />

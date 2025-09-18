@@ -61,7 +61,7 @@ export default function Navbar() {
                   <NavigationMenuLink asChild>
                     <Link
                       to="/dashboard"
-                      className="px-4 py-2 rounded-md hover:bg-white/10 transition-colors font-medium text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                      className="px-4 py-2 rounded-md hover:bg-white/10 active:bg-white/20 touch-manipulation transition-colors font-medium text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                     >
                       Dashboard
                     </Link>
@@ -76,7 +76,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2 min-w-0 justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer border-2 border-white/20 hover:border-primary transition-all">
+              <Avatar className="cursor-pointer border-2 border-white/20 hover:border-primary active:border-primary/80 touch-manipulation transition-all">
                 <AvatarImage src={user?.avatarUrl || ""} alt="Avatar" />
                 <AvatarFallback>
                   {user?.nickname?.charAt(0).toUpperCase() || "U"}
