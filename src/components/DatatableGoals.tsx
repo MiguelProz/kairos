@@ -456,7 +456,14 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id}
+                      {{
+                        title: "Título",
+                        category: "Categoría",
+                        status: "Estado",
+                        priority: "Prioridad",
+                        progress: "Progreso",
+                        dueDate: "Fecha límite",
+                      }[column.id as string] ?? column.id}
                     </DropdownMenuCheckboxItem>
                   );
                 })}
@@ -691,7 +698,12 @@ function TableCellViewer({
   }
 
   return (
-    <Drawer direction={"bottom"} open={open} onOpenChange={setOpen}>
+    <Drawer
+      direction={"bottom"}
+      open={open}
+      onOpenChange={setOpen}
+      dismissible={false}
+    >
       <DrawerTrigger asChild>
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
           {item.title}
@@ -764,31 +776,41 @@ function TableCellViewer({
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="dueDate">Fecha de vencimiento</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    data-empty={!due}
-                    className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon />
-                    {due ? due : <span>Selecciona fecha</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={due ? new Date(due) : undefined}
-                    onSelect={(date) =>
-                      setDue(date ? format(date, "dd/MM/yyyy") : "")
-                    }
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="hidden w-full sm:block">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      data-empty={!due}
+                      className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon />
+                      {due ? due : <span>Selecciona fecha</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={due ? new Date(due) : undefined}
+                      onSelect={(date) =>
+                        setDue(date ? format(date, "dd/MM/yyyy") : "")
+                      }
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="w-full sm:hidden">
+                <Input
+                  id="dueDate"
+                  type="date"
+                  value={due}
+                  onChange={(e) => setDue(e.target.value)}
+                />
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-3">
-            <Label htmlFor="priority">Priority</Label>
+            <Label htmlFor="priority">Prioridad</Label>
             <Select
               value={priority}
               onValueChange={(v) => setPriority(v as Goal["priority"])}
@@ -797,9 +819,9 @@ function TableCellViewer({
                 <SelectValue placeholder="Select a priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="low">Baja</SelectItem>
+                <SelectItem value="medium">Media</SelectItem>
+                <SelectItem value="high">Alta</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -807,7 +829,11 @@ function TableCellViewer({
           <DrawerFooter className="px-0">
             <div className="flex gap-2 justify-end">
               <DrawerClose asChild>
-                <Button type="button" variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
                   Cancelar
                 </Button>
               </DrawerClose>

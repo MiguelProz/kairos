@@ -86,7 +86,7 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={open} onOpenChange={setOpen} dismissible={false}>
       <DrawerTrigger asChild>
         <Button variant="outline" size="sm">
           <IconPlus />
@@ -163,34 +163,48 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="ng-due">Fecha de vencimiento</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    data-empty={!form.dueDate}
-                    className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon />
-                    {form.dueDate ? (
-                      form.dueDate
-                    ) : (
-                      <span>Selecciona fecha</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={form.dueDate ? new Date(form.dueDate) : undefined}
-                    onSelect={(date) =>
-                      setForm((f) => ({
-                        ...f,
-                        dueDate: date ? format(date, "dd/MM/yyyy") : "",
-                      }))
-                    }
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="hidden w-full sm:block">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      data-empty={!form.dueDate}
+                      className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon />
+                      {form.dueDate ? (
+                        form.dueDate
+                      ) : (
+                        <span>Selecciona fecha</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        form.dueDate ? new Date(form.dueDate) : undefined
+                      }
+                      onSelect={(date) =>
+                        setForm((f) => ({
+                          ...f,
+                          dueDate: date ? format(date, "dd/MM/yyyy") : "",
+                        }))
+                      }
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="w-full sm:hidden">
+                <Input
+                  id="ng-due"
+                  type="date"
+                  value={form.dueDate}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, dueDate: e.target.value }))
+                  }
+                />
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -206,7 +220,11 @@ function AddGoalDrawer({ onCreated }: { onCreated: (goal: Goal) => void }) {
           {error && <div className="text-destructive text-sm">{error}</div>}
           <div className="flex gap-2 justify-end">
             <DrawerClose asChild>
-              <Button type="button" variant="outline">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancelar
               </Button>
             </DrawerClose>
