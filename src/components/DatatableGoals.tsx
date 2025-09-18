@@ -1,7 +1,13 @@
 import * as React from "react";
 import { type DatatableRow } from "./DatatableGoals.schema";
 import { useAuth } from "@/providers/auth-provider";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   SwipeableList,
   SwipeableListItem,
@@ -111,6 +117,7 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
     (g: Goal, idx: number): DatatableRow => ({
       id: idx + 1,
       goalId: g._id,
+      description: g.description || "",
       title: g.title,
       category: g.category || "-",
       status: g.status,
@@ -316,7 +323,11 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
           </Card>
         )}
       </div>
-      <SwipeableList type={ListType.ANDROID} fullSwipe={true}>
+      <SwipeableList
+        type={ListType.ANDROID}
+        fullSwipe={true}
+        className="grid gap-4 "
+      >
         {Array.isArray(filteredData) && filteredData.length > 0 ? (
           filteredData.map((item) => (
             <SwipeableListItem
@@ -340,14 +351,17 @@ export function DataTable({ data: initialData }: { data?: DatatableRow[] }) {
                 </TrailingActions>
               }
             >
-              <Card className="mb-4 w-full">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-base font-semibold">
-                    {item.title}
-                  </CardTitle>
-                  <Badge className="ml-2" variant="outline">
-                    {item.category}
-                  </Badge>
+              <Card className="w-full">
+                <CardHeader>
+                  <div className="flex flex-row items-center justify-between">
+                    <CardTitle className="text-base font-semibold">
+                      {item.title}
+                    </CardTitle>
+                    <Badge className="ml-2" variant="outline">
+                      {item.category}
+                    </Badge>
+                  </div>
+                  <CardDescription>{item.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">

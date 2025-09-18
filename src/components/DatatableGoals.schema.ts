@@ -12,6 +12,7 @@ export const schema = z.object({
     progress: z.number(),
     dueDate: z.string().optional(), // fecha formateada o ISO
     createdAt: z.string().optional(),
+    description: z.string().optional().default(""),
 })
 
 export type DatatableRow = z.infer<typeof schema>
